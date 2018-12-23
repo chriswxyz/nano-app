@@ -1,0 +1,21 @@
+{
+  "name": "@chriswxyz/nano-app",
+  "version": "0.0.0",
+  "description": "A very very very small client side app library",
+  "main": "./bin-commonjs/index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "0.11.1",
+    "typescript": "3.2.2"
+  },
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esnext",
+    "build:cjs": "tsc ./src/index.ts --outDir ./bin-commonjs --module commonjs",
+    "watch:cjs": "tsc ./src/index.ts --outDir ./bin-commonjs --module commonjs --watch",
+    "build:esnext": "tsc ./src/index.ts --outDir ./bin-esnext --module esnext",
+    "watch:esnext": "tsc ./src/index.ts --outDir ./bin-esnext --module esnext --watch",
+    "serve": "http-server ./ -o"
+  },
+  "author": "",
+  "license": "MIT"
+}

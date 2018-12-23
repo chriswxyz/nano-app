@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Cat NanoApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class='flex w-screen h-screen'>
+
+</body>
+<script src="../bin-esnext/index.js" type="module"></script>
+<script type="module">
+    import { NanoApp } from '../bin-esnext/index.js'
+
+    const initialState = {
+        cat: {
+            type: 'initial'
+        }
+    }
+
+    function Root(state) {
+        const cat = Cat(state.cat);
+        return `<div class='p-3 text-lg w-screen'>
+            <h1 class='my-3'>Cat NanoApp</h1>
+            <div><button onClick='nano.catButtonClicked()' class='bg-blue text-white p-3 rounded'>Meow</button></div>
+            <div class='my-3'>${cat}</div>
+        </div>`;
+    }
+
+    function Cat(remoteCat) {
+        if (remoteCat.type === 'initial') {
+            return `<div>Let's load up a cat!</div>`
+        }
+
+        if (remoteCat.type === 'pending') {
+            return `<div>Just a meowment...</div>`
+        }
+
+        if (remoteCat.type === 'success') {
+            return `<img src='${remoteCat.value}' class='max-w-lg h-auto rounded-lg'/>`
+        }
+
+        return `<div>Error fetching a cat :(</div>`
+    }
+
+    function catButtonClicked(event) {
+        return (dispatch, getState) => {
+            dispatch({ type: '@example/FETCH_CATS_PENDING' });
+
+            fetch('https://aws.random.cat/meow')
+                .then(x => x.json())
+                .then(x => {
+                    dispatch({
+                        type: '@example/FETCH_CATS_SUCCESS',
+                        payload: x.file
+                    });
+                })
+                .catch(e => {
+                    dispatch({
+                        type: '@example/FETCH_CATS_FAILURE',
+                        payload: e
+                    });
+                })
+        }
+    }
+
+    const actionCreators = {
+        catButtonClicked
+    };
+
+    function Reducer(state, action) {
+        switch (action.type) {
+            case '@example/FETCH_CATS_PENDING': {
+                return {
+                    ...state,
+                    cat: { type: 'pending' }
+                }
+            }
+            case '@example/FETCH_CATS_SUCCESS': {
+                return {
+                    ...state,
+                    cat: {
+                        type: 'success',
+                        value: action.payload
+                    }
+                }
+            }
+            case '@example/FETCH_CATS_FAILURE': {
+                return {
+                    ...state,
+                    cat: {
+                        type: 'failure'
+                    }
+                }
+            }
+        }
+        return state;
+    }
+
+    const args = {
+        initialState,
+        actionCreators,
+        component: Root,
+        reducer: Reducer
+    };
+
+    const app = NanoApp(args);
+
+</script>
+
+</html>
